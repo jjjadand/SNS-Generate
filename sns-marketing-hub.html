@@ -1,0 +1,1546 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SNS Marketing Hub</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --line: #d8dfeb;
+      --text: #162033;
+      --muted: #667085;
+      --blue: #2563eb;
+      --teal: #0f766e;
+      --amber: #d97706;
+      --red: #dc2626;
+      --green: #15803d;
+      --shadow: 0 18px 38px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.10), transparent 28%),
+        radial-gradient(circle at top right, rgba(15, 118, 110, 0.08), transparent 22%),
+        var(--bg);
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background: #0f172a;
+      color: #dbe6ff;
+      padding: 24px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .brand {
+      padding: 10px 12px 18px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .brand p {
+      margin: 6px 0 0;
+      color: #94a3b8;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .nav {
+      display: grid;
+      gap: 8px;
+    }
+
+    .nav button {
+      width: 100%;
+      border: 0;
+      text-align: left;
+      border-radius: 14px;
+      padding: 14px 14px;
+      color: inherit;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .nav button.active {
+      background: rgba(59, 130, 246, 0.18);
+      color: #fff;
+    }
+
+    .nav strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .nav span {
+      display: block;
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.4;
+    }
+
+    .main {
+      padding: 26px;
+      overflow-x: hidden;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .header h2 {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1.1;
+    }
+
+    .header p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .status-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.82);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 12px;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: minmax(360px, 450px) minmax(420px, 1fr);
+      gap: 18px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid rgba(216, 223, 235, 0.95);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 18px 20px 12px;
+      border-bottom: 1px solid rgba(216, 223, 235, 0.8);
+    }
+
+    .card-header h3 {
+      margin: 0 0 6px;
+      font-size: 18px;
+    }
+
+    .card-header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .card-body {
+      padding: 18px 20px 20px;
+    }
+
+    .field + .field {
+      margin-top: 14px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"], input[type="number"], input[type="date"], select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 12px 14px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(37, 99, 235, 0.72);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
+    }
+
+    .platform-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .platform-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fbfdff;
+    }
+
+    .platform-item input {
+      margin: 0;
+    }
+
+    .platform-item strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .platform-item span {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button.primary, button.secondary, button.subtle {
+      border-radius: 12px;
+      padding: 11px 15px;
+      cursor: pointer;
+      border: 0;
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, var(--blue), #1d4ed8);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    button.secondary {
+      background: #ecfdf3;
+      color: var(--green);
+      border: 1px solid #ccefd8;
+    }
+
+    button.subtle {
+      background: #fff;
+      color: var(--muted);
+      border: 1px solid var(--line);
+    }
+
+    .hint, .info, .error {
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .hint {
+      background: #f8fafc;
+      color: var(--muted);
+      border: 1px solid var(--line);
+    }
+
+    .info {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+
+    .error {
+      background: #fef2f2;
+      color: var(--red);
+      border: 1px solid #fecaca;
+    }
+
+    .hidden { display: none !important; }
+
+    .materials-list, .source-list, .result-list, .post-list, .competitor-list, .kol-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .material, .source-item, .result-item, .post-item, .competitor-item, .kol-item {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      background: #fcfdff;
+    }
+
+    .material-head, .source-head, .result-head, .post-head, .competitor-head, .kol-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .material-title, .source-title, .post-title, .competitor-title, .kol-title {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .preview, .result-body, .post-body, .competitor-body {
+      margin-top: 10px;
+      white-space: pre-wrap;
+      line-height: 1.7;
+      font-size: 13px;
+      color: #344054;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .metric .label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .metric .value {
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .metric .sub {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px 8px;
+      border-bottom: 1px solid #edf1f7;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tabs button {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 9px 13px;
+      cursor: pointer;
+    }
+
+    .tabs button.active {
+      background: #0f172a;
+      color: #fff;
+      border-color: #0f172a;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 4px 8px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 12px;
+      margin-right: 6px;
+      margin-top: 6px;
+    }
+
+    .tag-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 1180px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        gap: 12px;
+      }
+
+      .nav {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 780px) {
+      .main { padding: 18px; }
+      .row, .platform-grid, .metric-grid {
+        grid-template-columns: 1fr;
+      }
+      .nav { grid-template-columns: 1fr; }
+      .header {
+        flex-direction: column;
+      }
+      .status-bar {
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>SNS Marketing Hub</h1>
+        <p>统一内容生成、实时数据复盘与 KOL 跟进。前端只保留这一套，数据优先走真实后端抓取。</p>
+      </div>
+      <div class="nav">
+        <button class="active" data-section="content">
+          <strong>内容生成</strong>
+          <span>多平台一键生成，支持图片、文档、网页和补充 prompt。</span>
+        </button>
+        <button data-section="data">
+          <strong>数据月度复盘</strong>
+          <span>配置抓取源，实时刷新月度指标、帖子表现和竞品洞察。</span>
+        </button>
+        <button data-section="kol">
+          <strong>KOL 筛选与跟进</strong>
+          <span>沿用现有后端能力，统一在同一前端入口里操作。</span>
+        </button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="header">
+        <div>
+          <h2 id="pageTitle">内容生成</h2>
+          <p id="pageDesc">多平台文案一键生成，支持上传辅助素材，让每次生成都建立在真实参考上。</p>
+        </div>
+        <div class="status-bar">
+          <span class="chip" id="backendStatus">后端连接中…</span>
+          <span class="chip" id="timeChip"></span>
+        </div>
+      </div>
+
+      <section class="section active" id="section-content">
+        <div class="grid-2">
+          <div class="stack">
+            <div class="card">
+              <div class="card-header">
+                <h3>内容设置</h3>
+                <p>不再拆多个小工具，统一从这里选平台、填主题和参考素材。</p>
+              </div>
+              <div class="card-body">
+                <div class="field">
+                  <label>目标平台</label>
+                  <div class="platform-grid" id="platformGrid"></div>
+                </div>
+                <div class="field">
+                  <label for="contentTopic">主题 / 产品名称</label>
+                  <input id="contentTopic" type="text" placeholder="例如：reComputer J5012 在本地大模型部署上的优势" />
+                </div>
+                <div class="row">
+                  <div class="field">
+                    <label for="contentAudience">目标受众</label>
+                    <input id="contentAudience" type="text" placeholder="例如：国内工业客户、方案商、AI 工程师" />
+                  </div>
+                  <div class="field">
+                    <label for="contentAngle">内容角度</label>
+                    <select id="contentAngle">
+                      <option value="产品发布">产品发布</option>
+                      <option value="行业洞察">行业洞察</option>
+                      <option value="案例分享">案例分享</option>
+                      <option value="活动预热">活动预热</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="contentFeatures">核心卖点 / 参考要点</label>
+                  <textarea id="contentFeatures" placeholder="例如：&#10;1. 支持 Jetson Orin NX / AGX&#10;2. 适合本地 VLM / RAG / 工业检测&#10;3. 工业部署门槛低"></textarea>
+                </div>
+                <div class="field">
+                  <label for="contentPrompt">补充 Prompt</label>
+                  <textarea id="contentPrompt" placeholder="例如：国内平台统一中文；语气更像真实 ToB 市场内容，不要太官话。"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3>参考素材</h3>
+                <p>支持图片、文档和网页。素材会先进入后端素材库，再作为生成上下文引用。</p>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="field">
+                    <label for="materialUrl">网页 URL</label>
+                    <input id="materialUrl" type="text" placeholder="粘贴产品页 / 资料页 / 案例页" />
+                  </div>
+                  <div class="field">
+                    <label>&nbsp;</label>
+                    <button class="subtle" id="addMaterialUrlBtn" style="width:100%">抓取网页到素材库</button>
+                  </div>
+                </div>
+                <div class="actions" style="margin-top:12px">
+                  <label class="subtle" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer">
+                    上传图片 / 文档
+                    <input id="materialFileInput" type="file" accept=".txt,.md,.docx,.png,.jpg,.jpeg,.webp,.gif" multiple class="hidden" />
+                  </label>
+                  <button class="subtle" id="refreshMaterialsBtn">刷新素材库</button>
+                </div>
+                <div class="hint" style="margin-top:12px">图片会自动做视觉信息提取；文档和网页会抽正文片段。勾选后会一起参与生成。</div>
+                <div class="materials-list" id="materialsList" style="margin-top:14px"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stack">
+            <div class="card">
+              <div class="card-header">
+                <h3>生成结果</h3>
+                <p>单击按钮后，后端会按选中的平台批量生成，并立即回写到这个统一界面。</p>
+              </div>
+              <div class="card-body">
+                <div class="actions" style="margin-bottom:12px">
+                  <button class="primary" id="generateContentBtn">一键生成多平台内容</button>
+                  <button class="subtle" id="clearContentBtn">清空结果</button>
+                </div>
+                <div class="info hidden" id="contentInfo"></div>
+                <div class="error hidden" id="contentError" style="margin-top:12px"></div>
+                <div class="result-list" id="contentResults" style="margin-top:14px"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="section-data">
+        <div class="stack">
+          <div class="card">
+            <div class="card-header">
+              <h3>实时抓取源</h3>
+              <p>这里定义“真实数据”来源。每次点击刷新都会实际抓网页并更新前端，不再读种子样例。</p>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="field">
+                  <label for="sourceKind">抓取类型</label>
+                  <select id="sourceKind">
+                    <option value="monthly">月度指标</option>
+                    <option value="post">帖子表现</option>
+                    <option value="competitor">竞品洞察</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="sourceName">来源名称</label>
+                  <input id="sourceName" type="text" placeholder="例如：Seeed LinkedIn Analytics 截图页" />
+                </div>
+              </div>
+              <div class="row">
+                <div class="field">
+                  <label for="sourcePlatform">平台</label>
+                  <input id="sourcePlatform" type="text" placeholder="例如：LinkedIn / 微信公众号 / 官网" />
+                </div>
+                <div class="field">
+                  <label for="sourceRegion">地区</label>
+                  <input id="sourceRegion" type="text" placeholder="例如：中国大陆 / Global" />
+                </div>
+              </div>
+              <div class="field">
+                <label for="sourceUrl">抓取 URL</label>
+                <input id="sourceUrl" type="text" placeholder="粘贴真实要抓取的页面 URL" />
+              </div>
+              <div class="actions" style="margin-top:12px">
+                <button class="primary" id="saveSourceBtn">保存抓取源</button>
+                <button class="secondary" id="refreshLiveBtn">立即抓取并刷新所有数据</button>
+                <button class="subtle" id="reloadDashboardBtn">只刷新前端展示</button>
+              </div>
+              <div class="info hidden" id="dataInfo" style="margin-top:12px"></div>
+              <div class="error hidden" id="dataError" style="margin-top:12px"></div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="stack">
+              <div class="card">
+                <div class="card-header">
+                  <h3>抓取源列表</h3>
+                  <p>删除源后，后续刷新不会再访问它。切换到本页时会自动刷新一次 dashboard。</p>
+                </div>
+                <div class="card-body">
+                  <div class="tabs" id="sourceTabs">
+                    <button class="active" data-kind="all">全部</button>
+                    <button data-kind="monthly">月度指标</button>
+                    <button data-kind="post">帖子表现</button>
+                    <button data-kind="competitor">竞品洞察</button>
+                  </div>
+                  <div class="source-list" id="sourceList" style="margin-top:14px"></div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <h3>月度指标</h3>
+                  <p>来自实时抓取结果，不读 `sns_monthly` 的种子样例。</p>
+                </div>
+                <div class="card-body">
+                  <div class="metric-grid" id="metricGrid"></div>
+                  <div style="margin-top:14px;overflow:auto">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>月份</th>
+                          <th>LinkedIn 曝光</th>
+                          <th>X 曝光</th>
+                          <th>LinkedIn 互动率</th>
+                          <th>X 互动率</th>
+                          <th>LI 粉丝</th>
+                          <th>原始摘要</th>
+                        </tr>
+                      </thead>
+                      <tbody id="monthlyTable"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="stack">
+              <div class="card">
+                <div class="card-header">
+                  <h3>帖子表现</h3>
+                  <p>按实时抓取的帖子数据排序展示。这里不再依赖手工录入的 fake 数据。</p>
+                </div>
+                <div class="card-body">
+                  <div class="post-list" id="postList"></div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <h3>竞争对手分析</h3>
+                  <p>基于实时抓取源最新快照生成的结构化洞察。</p>
+                </div>
+                <div class="card-body">
+                  <div class="competitor-list" id="competitorList"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="section-kol">
+        <div class="grid-2">
+          <div class="stack">
+            <div class="card">
+              <div class="card-header">
+                <h3>KOL 新增 / 编辑</h3>
+                <p>沿用当前后端 `/api/kols` 接口，不再单独跳转到另一套前端。</p>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="field">
+                    <label for="kolName">名称</label>
+                    <input id="kolName" type="text" />
+                  </div>
+                  <div class="field">
+                    <label for="kolHandle">Handle</label>
+                    <input id="kolHandle" type="text" />
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="field">
+                    <label for="kolPlatform">平台</label>
+                    <input id="kolPlatform" type="text" value="YouTube" />
+                  </div>
+                  <div class="field">
+                    <label for="kolRegion">地区</label>
+                    <input id="kolRegion" type="text" value="North America" />
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="field">
+                    <label for="kolCategory">内容方向</label>
+                    <input id="kolCategory" type="text" />
+                  </div>
+                  <div class="field">
+                    <label for="kolFollowers">粉丝数</label>
+                    <input id="kolFollowers" type="text" />
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="field">
+                    <label for="kolViews">平均播放 / 浏览</label>
+                    <input id="kolViews" type="text" />
+                  </div>
+                  <div class="field">
+                    <label for="kolEngagement">互动率</label>
+                    <input id="kolEngagement" type="text" />
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="field">
+                    <label for="kolEmail">邮箱</label>
+                    <input id="kolEmail" type="text" />
+                  </div>
+                  <div class="field">
+                    <label for="kolStatus">状态</label>
+                    <select id="kolStatus">
+                      <option value="待联系">待联系</option>
+                      <option value="已发邮件">已发邮件</option>
+                      <option value="已回复">已回复</option>
+                      <option value="合作中">合作中</option>
+                      <option value="已完成">已完成</option>
+                      <option value="不合适">不合适</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="field">
+                    <label for="kolLanguage">语言</label>
+                    <select id="kolLanguage">
+                      <option value="English">English</option>
+                      <option value="中文">中文</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="kolScore">匹配度</label>
+                    <input id="kolScore" type="number" value="80" />
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="kolNotes">备注</label>
+                  <textarea id="kolNotes"></textarea>
+                </div>
+                <div class="actions" style="margin-top:12px">
+                  <button class="primary" id="saveKolBtn">保存 KOL</button>
+                  <button class="subtle" id="resetKolBtn">清空表单</button>
+                </div>
+                <div class="error hidden" id="kolError" style="margin-top:12px"></div>
+                <div class="info hidden" id="kolInfo" style="margin-top:12px"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stack">
+            <div class="card">
+              <div class="card-header">
+                <h3>KOL 列表</h3>
+                <p>修改状态和删除都直接回写后端。</p>
+              </div>
+              <div class="card-body">
+                <div class="kol-list" id="kolList"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const apiBase = window.location.origin;
+    const pageMeta = {
+      content: {
+        title: "内容生成",
+        desc: "多平台文案一键生成，支持上传辅助素材，让每次生成都建立在真实参考上。",
+      },
+      data: {
+        title: "数据月度复盘",
+        desc: "通过你配置的真实抓取源进行实时刷新，不再展示伪造样例。",
+      },
+      kol: {
+        title: "KOL 筛选与跟进",
+        desc: "统一在一套前端里完成录入、筛选、状态更新和跟进管理。",
+      },
+    };
+
+    const contentPlatforms = [
+      ["微信公众号", "长文 / 深度解析"],
+      ["小红书", "图文笔记 / 种草"],
+      ["抖音", "短视频口播 / 分镜"],
+      ["视频号", "企业账号短内容"],
+      ["B站", "技术视频简介 / 大纲"],
+      ["知乎", "专业问答 / 文章"],
+      ["LinkedIn", "海外 B2B 专业帖"],
+      ["X", "短帖 / thread"],
+    ];
+
+    const state = {
+      section: "content",
+      materials: [],
+      selectedMaterials: new Set(),
+      contentResults: [],
+      crawlSources: [],
+      sourceFilter: "all",
+      dashboard: { monthly: [], posts: [], competitors: [] },
+      kols: [],
+      dataLoadedOnce: false,
+    };
+
+    const els = {
+      navButtons: Array.from(document.querySelectorAll(".nav button")),
+      sections: {
+        content: document.getElementById("section-content"),
+        data: document.getElementById("section-data"),
+        kol: document.getElementById("section-kol"),
+      },
+      pageTitle: document.getElementById("pageTitle"),
+      pageDesc: document.getElementById("pageDesc"),
+      backendStatus: document.getElementById("backendStatus"),
+      timeChip: document.getElementById("timeChip"),
+      platformGrid: document.getElementById("platformGrid"),
+      contentTopic: document.getElementById("contentTopic"),
+      contentAudience: document.getElementById("contentAudience"),
+      contentAngle: document.getElementById("contentAngle"),
+      contentFeatures: document.getElementById("contentFeatures"),
+      contentPrompt: document.getElementById("contentPrompt"),
+      materialUrl: document.getElementById("materialUrl"),
+      materialFileInput: document.getElementById("materialFileInput"),
+      addMaterialUrlBtn: document.getElementById("addMaterialUrlBtn"),
+      refreshMaterialsBtn: document.getElementById("refreshMaterialsBtn"),
+      materialsList: document.getElementById("materialsList"),
+      generateContentBtn: document.getElementById("generateContentBtn"),
+      clearContentBtn: document.getElementById("clearContentBtn"),
+      contentInfo: document.getElementById("contentInfo"),
+      contentError: document.getElementById("contentError"),
+      contentResults: document.getElementById("contentResults"),
+      sourceKind: document.getElementById("sourceKind"),
+      sourceName: document.getElementById("sourceName"),
+      sourcePlatform: document.getElementById("sourcePlatform"),
+      sourceRegion: document.getElementById("sourceRegion"),
+      sourceUrl: document.getElementById("sourceUrl"),
+      saveSourceBtn: document.getElementById("saveSourceBtn"),
+      refreshLiveBtn: document.getElementById("refreshLiveBtn"),
+      reloadDashboardBtn: document.getElementById("reloadDashboardBtn"),
+      dataInfo: document.getElementById("dataInfo"),
+      dataError: document.getElementById("dataError"),
+      sourceTabs: document.getElementById("sourceTabs"),
+      sourceList: document.getElementById("sourceList"),
+      metricGrid: document.getElementById("metricGrid"),
+      monthlyTable: document.getElementById("monthlyTable"),
+      postList: document.getElementById("postList"),
+      competitorList: document.getElementById("competitorList"),
+      kolName: document.getElementById("kolName"),
+      kolHandle: document.getElementById("kolHandle"),
+      kolPlatform: document.getElementById("kolPlatform"),
+      kolRegion: document.getElementById("kolRegion"),
+      kolCategory: document.getElementById("kolCategory"),
+      kolFollowers: document.getElementById("kolFollowers"),
+      kolViews: document.getElementById("kolViews"),
+      kolEngagement: document.getElementById("kolEngagement"),
+      kolEmail: document.getElementById("kolEmail"),
+      kolStatus: document.getElementById("kolStatus"),
+      kolLanguage: document.getElementById("kolLanguage"),
+      kolScore: document.getElementById("kolScore"),
+      kolNotes: document.getElementById("kolNotes"),
+      saveKolBtn: document.getElementById("saveKolBtn"),
+      resetKolBtn: document.getElementById("resetKolBtn"),
+      kolError: document.getElementById("kolError"),
+      kolInfo: document.getElementById("kolInfo"),
+      kolList: document.getElementById("kolList"),
+    };
+
+    function setMessage(node, message, visible) {
+      node.textContent = message || "";
+      node.classList.toggle("hidden", !visible);
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    async function request(path, options = {}) {
+      const response = await fetch(`${apiBase}${path}`, {
+        headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+        ...options,
+      });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({ detail: response.statusText }));
+        throw new Error(payload.detail || `HTTP ${response.status}`);
+      }
+      return response.json();
+    }
+
+    function renderTime() {
+      els.timeChip.textContent = new Date().toLocaleString("zh-CN", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+
+    function renderContentPlatforms() {
+      els.platformGrid.innerHTML = contentPlatforms.map(([name, desc], index) => `
+        <label class="platform-item">
+          <input type="checkbox" value="${name}" ${index < 4 ? "checked" : ""} />
+          <div>
+            <strong>${name}</strong>
+            <span>${desc}</span>
+          </div>
+        </label>
+      `).join("");
+    }
+
+    function selectedContentPlatforms() {
+      return Array.from(els.platformGrid.querySelectorAll("input:checked")).map((node) => node.value);
+    }
+
+    async function loadBackendConfig() {
+      try {
+        const config = await request("/api/config");
+        els.backendStatus.textContent = config.key_loaded
+          ? `AI 已就绪 · ${config.model}`
+          : "后端未检测到可用 API Key";
+        els.backendStatus.style.color = config.key_loaded ? "var(--green)" : "var(--red)";
+      } catch (error) {
+        els.backendStatus.textContent = "后端连接失败";
+        els.backendStatus.style.color = "var(--red)";
+      }
+    }
+
+    async function loadMaterials() {
+      state.materials = await request("/api/materials");
+      renderMaterials();
+    }
+
+    function renderMaterials() {
+      if (!state.materials.length) {
+        els.materialsList.innerHTML = `<div class="hint">素材库还是空的。先上传图片 / 文档或抓取网页，再勾选作为生成参考。</div>`;
+        return;
+      }
+
+      els.materialsList.innerHTML = state.materials.map((item) => `
+        <div class="material">
+          <div class="material-head">
+            <label class="material-title">
+              <input type="checkbox" data-id="${item.id}" ${state.selectedMaterials.has(item.id) ? "checked" : ""} />
+              <div>
+                <div><strong>${escapeHtml(item.name)}</strong></div>
+                <div class="meta">${escapeHtml(item.type)} · ${escapeHtml(item.created_at || "")}</div>
+              </div>
+            </label>
+            <button class="subtle" data-delete-material="${item.id}">删除</button>
+          </div>
+          <div class="preview">${escapeHtml(item.preview || "(无预览内容)")}</div>
+        </div>
+      `).join("");
+
+      els.materialsList.querySelectorAll("input[data-id]").forEach((node) => {
+        node.addEventListener("change", () => {
+          const id = Number(node.dataset.id);
+          if (node.checked) state.selectedMaterials.add(id);
+          else state.selectedMaterials.delete(id);
+        });
+      });
+
+      els.materialsList.querySelectorAll("button[data-delete-material]").forEach((node) => {
+        node.addEventListener("click", async () => {
+          try {
+            await fetch(`${apiBase}/api/materials/${node.dataset.deleteMaterial}`, { method: "DELETE" });
+            state.selectedMaterials.delete(Number(node.dataset.deleteMaterial));
+            await loadMaterials();
+          } catch (error) {
+            setMessage(els.contentError, error.message, true);
+          }
+        });
+      });
+    }
+
+    async function uploadMaterialFiles(files) {
+      const picked = Array.from(files || []);
+      if (!picked.length) return;
+      setMessage(els.contentError, "", false);
+      setMessage(els.contentInfo, `正在上传 ${picked.length} 个素材...`, true);
+      try {
+        for (const file of picked) {
+          const form = new FormData();
+          form.append("file", file);
+          const response = await fetch(`${apiBase}/api/materials/upload`, { method: "POST", body: form });
+          if (!response.ok) {
+            const payload = await response.json().catch(() => ({ detail: response.statusText }));
+            throw new Error(payload.detail || `上传失败: ${file.name}`);
+          }
+        }
+        await loadMaterials();
+        setMessage(els.contentInfo, "素材上传完成", true);
+      } catch (error) {
+        setMessage(els.contentError, error.message, true);
+      }
+    }
+
+    async function addMaterialUrl() {
+      const url = els.materialUrl.value.trim();
+      if (!url) {
+        setMessage(els.contentError, "请先输入要抓取的网页 URL", true);
+        return;
+      }
+      setMessage(els.contentError, "", false);
+      setMessage(els.contentInfo, "正在抓取网页并写入素材库...", true);
+      try {
+        await request("/api/materials/url", {
+          method: "POST",
+          body: JSON.stringify({ url }),
+        });
+        els.materialUrl.value = "";
+        await loadMaterials();
+        setMessage(els.contentInfo, "网页素材已加入素材库", true);
+      } catch (error) {
+        setMessage(els.contentError, error.message, true);
+      }
+    }
+
+    function renderContentResults() {
+      if (!state.contentResults.length) {
+        els.contentResults.innerHTML = `<div class="hint">勾选平台、填写主题后点击“一键生成多平台内容”。生成结果会直接在这里展开。</div>`;
+        return;
+      }
+      els.contentResults.innerHTML = state.contentResults.map((item) => `
+        <div class="result-item">
+          <div class="result-head">
+            <div>
+              <strong>${escapeHtml(item.platform)}</strong>
+              ${item.error ? `<div class="meta">生成失败</div>` : `<div class="meta">已生成，可直接复制再微调</div>`}
+            </div>
+            ${item.content ? `<button class="subtle" data-copy-platform="${escapeHtml(item.platform)}">复制</button>` : ""}
+          </div>
+          ${item.error
+            ? `<div class="error" style="margin-top:10px">${escapeHtml(item.error)}</div>`
+            : `<div class="result-body">${escapeHtml(item.content || "")}</div>`}
+        </div>
+      `).join("");
+
+      els.contentResults.querySelectorAll("button[data-copy-platform]").forEach((node) => {
+        node.addEventListener("click", async () => {
+          const platform = node.dataset.copyPlatform;
+          const target = state.contentResults.find((item) => item.platform === platform);
+          if (!target?.content) return;
+          await navigator.clipboard.writeText(target.content);
+          node.textContent = "已复制";
+          setTimeout(() => { node.textContent = "复制"; }, 1500);
+        });
+      });
+    }
+
+    async function generateContent() {
+      const platforms = selectedContentPlatforms();
+      if (!platforms.length) {
+        setMessage(els.contentError, "请至少选择一个目标平台", true);
+        return;
+      }
+      const topic = els.contentTopic.value.trim();
+      if (!topic) {
+        setMessage(els.contentError, "请先填写主题 / 产品名称", true);
+        return;
+      }
+
+      setMessage(els.contentError, "", false);
+      setMessage(els.contentInfo, "后端正在按平台逐个生成...", true);
+      els.generateContentBtn.disabled = true;
+      els.generateContentBtn.textContent = "生成中...";
+
+      try {
+        const data = await request("/api/generate-batch", {
+          method: "POST",
+          body: JSON.stringify({
+            content_type: "social",
+            topic,
+            product: topic,
+            audience: els.contentAudience.value.trim(),
+            post_type: els.contentAngle.value,
+            features: els.contentFeatures.value.trim(),
+            custom_prompt: els.contentPrompt.value.trim(),
+            material_ids: Array.from(state.selectedMaterials),
+            platforms,
+            language: "zh-CN",
+          }),
+        });
+        state.contentResults = data.results || [];
+        renderContentResults();
+        setMessage(els.contentInfo, `已完成 ${state.contentResults.length} 个平台的生成`, true);
+      } catch (error) {
+        state.contentResults = [];
+        renderContentResults();
+        setMessage(els.contentError, error.message, true);
+      } finally {
+        els.generateContentBtn.disabled = false;
+        els.generateContentBtn.textContent = "一键生成多平台内容";
+      }
+    }
+
+    async function loadCrawlSources() {
+      state.crawlSources = await request("/api/crawl-sources");
+      renderCrawlSources();
+    }
+
+    function renderCrawlSources() {
+      const filter = state.sourceFilter;
+      const items = state.crawlSources.filter((item) => filter === "all" ? true : item.kind === filter);
+      if (!items.length) {
+        els.sourceList.innerHTML = `<div class="hint">还没有抓取源。先录入真实 URL，再点击“立即抓取并刷新所有数据”。</div>`;
+        return;
+      }
+
+      els.sourceList.innerHTML = items.map((item) => `
+        <div class="source-item">
+          <div class="source-head">
+            <div>
+              <div><strong>${escapeHtml(item.name)}</strong></div>
+              <div class="meta">${escapeHtml(item.kind)} · ${escapeHtml(item.platform || "-")} · ${escapeHtml(item.region || "-")}</div>
+              <div class="meta">${escapeHtml(item.url)}</div>
+            </div>
+            <div class="actions">
+              <button class="secondary" data-refresh-source="${item.id}">抓取</button>
+              <button class="subtle" data-delete-source="${item.id}">删除</button>
+            </div>
+          </div>
+        </div>
+      `).join("");
+
+      els.sourceList.querySelectorAll("button[data-delete-source]").forEach((node) => {
+        node.addEventListener("click", async () => {
+          try {
+            await fetch(`${apiBase}/api/crawl-sources/${node.dataset.deleteSource}`, { method: "DELETE" });
+            await loadCrawlSources();
+          } catch (error) {
+            setMessage(els.dataError, error.message, true);
+          }
+        });
+      });
+
+      els.sourceList.querySelectorAll("button[data-refresh-source]").forEach((node) => {
+        node.addEventListener("click", async () => {
+          await liveRefresh([Number(node.dataset.refreshSource)]);
+        });
+      });
+    }
+
+    async function saveCrawlSource() {
+      const payload = {
+        kind: els.sourceKind.value,
+        name: els.sourceName.value.trim(),
+        platform: els.sourcePlatform.value.trim(),
+        region: els.sourceRegion.value.trim(),
+        url: els.sourceUrl.value.trim(),
+      };
+      if (!payload.name || !payload.url) {
+        setMessage(els.dataError, "来源名称和 URL 都不能为空", true);
+        return;
+      }
+      setMessage(els.dataError, "", false);
+      try {
+        await request("/api/crawl-sources", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+        els.sourceName.value = "";
+        els.sourceUrl.value = "";
+        await loadCrawlSources();
+        setMessage(els.dataInfo, "抓取源已保存", true);
+      } catch (error) {
+        setMessage(els.dataError, error.message, true);
+      }
+    }
+
+    async function loadDashboard() {
+      const data = await request("/api/live-dashboard");
+      state.dashboard = data;
+      renderDashboard();
+    }
+
+    function renderDashboard() {
+      const monthly = state.dashboard.monthly || [];
+      const posts = state.dashboard.posts || [];
+      const competitors = state.dashboard.competitors || [];
+
+      const latest = monthly.at(-1);
+      const prev = monthly.length > 1 ? monthly.at(-2) : null;
+
+      const metrics = [
+        ["LinkedIn 月曝光", latest?.linkedin_impressions ?? 0, prev?.linkedin_impressions ?? 0],
+        ["X 月曝光", latest?.x_impressions ?? 0, prev?.x_impressions ?? 0],
+        ["LinkedIn 互动率", latest?.linkedin_engagement ?? 0, prev?.linkedin_engagement ?? 0, "%"],
+        ["LinkedIn 粉丝", latest?.linkedin_followers ?? 0, prev?.linkedin_followers ?? 0],
+      ];
+
+      els.metricGrid.innerHTML = metrics.map(([label, value, prevValue, unit = ""]) => {
+        const delta = Number(prevValue) > 0 ? (((Number(value) - Number(prevValue)) / Number(prevValue)) * 100).toFixed(1) : "0.0";
+        const positive = Number(value) >= Number(prevValue);
+        return `
+          <div class="metric">
+            <div class="label">${label}</div>
+            <div class="value">${Number(value).toLocaleString()}${unit}</div>
+            <div class="sub">${positive ? "↑" : "↓"} ${delta}% vs 上次快照</div>
+          </div>
+        `;
+      }).join("");
+
+      els.monthlyTable.innerHTML = monthly.length
+        ? monthly.map((row) => `
+            <tr>
+              <td>${escapeHtml(row.month)} ${row.year}</td>
+              <td>${Number(row.linkedin_impressions || 0).toLocaleString()}</td>
+              <td>${Number(row.x_impressions || 0).toLocaleString()}</td>
+              <td>${row.linkedin_engagement || 0}%</td>
+              <td>${row.x_engagement || 0}%</td>
+              <td>${Number(row.linkedin_followers || 0).toLocaleString()}</td>
+              <td class="meta">${escapeHtml((row.raw_excerpt || "").slice(0, 120))}</td>
+            </tr>
+          `).join("")
+        : `<tr><td colspan="7" class="meta">暂无实时月度指标。请先配置“月度指标”抓取源并点击刷新。</td></tr>`;
+
+      els.postList.innerHTML = posts.length
+        ? posts.map((post) => `
+            <div class="post-item">
+              <div class="post-head">
+                <div>
+                  <div><strong>${escapeHtml(post.title)}</strong></div>
+                  <div class="meta">${escapeHtml(post.platform)} · ${escapeHtml(post.post_type || "")} · ${escapeHtml(post.posted_at || post.created_at || "")}</div>
+                </div>
+                <div class="meta">互动率 ${post.engagement_rate || 0}%</div>
+              </div>
+              <div class="post-body">${escapeHtml(post.content || "")}</div>
+              <div class="tag-group">
+                <span class="pill">曝光 ${Number(post.impressions || 0).toLocaleString()}</span>
+                <span class="pill">点赞 ${Number(post.likes || 0).toLocaleString()}</span>
+                <span class="pill">评论 ${Number(post.comments || 0).toLocaleString()}</span>
+                <span class="pill">转发 ${Number(post.shares || 0).toLocaleString()}</span>
+              </div>
+            </div>
+          `).join("")
+        : `<div class="hint">暂无实时帖子数据。请先配置“帖子表现”抓取源并点击刷新。</div>`;
+
+      els.competitorList.innerHTML = competitors.length
+        ? competitors.map((item) => `
+            <div class="competitor-item">
+              <div class="competitor-head">
+                <div>
+                  <div><strong>${escapeHtml(item.name || item.source_name || "未命名竞品")}</strong></div>
+                  <div class="meta">${escapeHtml(item.platform || item.source_platform || "")} · ${escapeHtml(item.region || item.source_region || "")}</div>
+                </div>
+                <div class="meta">${escapeHtml(item.followers || "")}</div>
+              </div>
+              <div class="tag-group">
+                ${item.posting_freq ? `<span class="pill">发帖频率 ${escapeHtml(item.posting_freq)}</span>` : ""}
+                ${item.avg_engagement ? `<span class="pill">平均互动 ${escapeHtml(item.avg_engagement)}</span>` : ""}
+              </div>
+              <div class="competitor-body">${escapeHtml(item.learnings || "暂无洞察")}</div>
+              ${(item.top_actions || []).length ? `
+                <div class="tag-group">
+                  ${item.top_actions.map((action) => `<span class="pill">${escapeHtml(action)}</span>`).join("")}
+                </div>
+              ` : ""}
+            </div>
+          `).join("")
+        : `<div class="hint">暂无实时竞品洞察。请先配置“竞品洞察”抓取源并点击刷新。</div>`;
+    }
+
+    async function liveRefresh(sourceIds = []) {
+      setMessage(els.dataError, "", false);
+      setMessage(els.dataInfo, "正在抓取真实数据并更新前端...", true);
+      els.refreshLiveBtn.disabled = true;
+      try {
+        const response = await request("/api/live-refresh", {
+          method: "POST",
+          body: JSON.stringify({ source_ids: sourceIds }),
+        });
+        await Promise.all([loadDashboard(), loadCrawlSources()]);
+        const failed = (response.results || []).filter((item) => !item.success);
+        if (failed.length) {
+          setMessage(els.dataError, `部分抓取失败：${failed.map((item) => `#${item.source_id} ${item.error}`).join(" | ")}`, true);
+        }
+        setMessage(els.dataInfo, "实时抓取完成，前端已刷新到最新结果", true);
+      } catch (error) {
+        setMessage(els.dataError, error.message, true);
+      } finally {
+        els.refreshLiveBtn.disabled = false;
+      }
+    }
+
+    async function ensureLiveDataOnTabEnter() {
+      if (state.section !== "data") return;
+      try {
+        await Promise.all([loadCrawlSources(), loadDashboard()]);
+        if (state.crawlSources.length) {
+          await liveRefresh([]);
+        }
+      } catch (error) {
+        setMessage(els.dataError, error.message, true);
+      }
+    }
+
+    async function loadKols() {
+      state.kols = await request("/api/kols");
+      renderKols();
+    }
+
+    function resetKolForm() {
+      els.kolName.value = "";
+      els.kolHandle.value = "";
+      els.kolPlatform.value = "YouTube";
+      els.kolRegion.value = "North America";
+      els.kolCategory.value = "";
+      els.kolFollowers.value = "";
+      els.kolViews.value = "";
+      els.kolEngagement.value = "";
+      els.kolEmail.value = "";
+      els.kolStatus.value = "待联系";
+      els.kolLanguage.value = "English";
+      els.kolScore.value = "80";
+      els.kolNotes.value = "";
+    }
+
+    async function saveKol() {
+      setMessage(els.kolError, "", false);
+      try {
+        await request("/api/kols", {
+          method: "POST",
+          body: JSON.stringify({
+            name: els.kolName.value.trim(),
+            handle: els.kolHandle.value.trim(),
+            platform: els.kolPlatform.value.trim(),
+            region: els.kolRegion.value.trim(),
+            category: els.kolCategory.value.trim(),
+            followers: els.kolFollowers.value.trim(),
+            avg_views: els.kolViews.value.trim(),
+            engagement_rate: els.kolEngagement.value.trim(),
+            email: els.kolEmail.value.trim(),
+            match_score: Number(els.kolScore.value || 0),
+            status: els.kolStatus.value,
+            language: els.kolLanguage.value,
+            notes: els.kolNotes.value.trim(),
+          }),
+        });
+        resetKolForm();
+        await loadKols();
+        setMessage(els.kolInfo, "KOL 已保存", true);
+      } catch (error) {
+        setMessage(els.kolError, error.message, true);
+      }
+    }
+
+    function renderKols() {
+      if (!state.kols.length) {
+        els.kolList.innerHTML = `<div class="hint">暂无 KOL 数据。</div>`;
+        return;
+      }
+
+      els.kolList.innerHTML = state.kols.map((kol) => `
+        <div class="kol-item">
+          <div class="kol-head">
+            <div>
+              <div><strong>${escapeHtml(kol.name)}</strong></div>
+              <div class="meta">${escapeHtml(kol.handle || "")} · ${escapeHtml(kol.platform || "")} · ${escapeHtml(kol.region || "")}</div>
+            </div>
+            <div class="actions">
+              <select data-kol-status="${kol.id}">
+                ${["待联系","已发邮件","已回复","合作中","已完成","不合适"].map((status) => `
+                  <option value="${status}" ${kol.status === status ? "selected" : ""}>${status}</option>
+                `).join("")}
+              </select>
+              <button class="subtle" data-delete-kol="${kol.id}">删除</button>
+            </div>
+          </div>
+          <div class="tag-group">
+            ${kol.followers ? `<span class="pill">粉丝 ${escapeHtml(kol.followers)}</span>` : ""}
+            ${kol.avg_views ? `<span class="pill">平均播放 ${escapeHtml(kol.avg_views)}</span>` : ""}
+            ${kol.engagement_rate ? `<span class="pill">互动率 ${escapeHtml(kol.engagement_rate)}</span>` : ""}
+            <span class="pill">匹配度 ${escapeHtml(kol.match_score)}</span>
+            <span class="pill">${escapeHtml(kol.language || "")}</span>
+          </div>
+          ${kol.notes ? `<div class="preview">${escapeHtml(kol.notes)}</div>` : ""}
+        </div>
+      `).join("");
+
+      els.kolList.querySelectorAll("select[data-kol-status]").forEach((node) => {
+        node.addEventListener("change", async () => {
+          try {
+            await request(`/api/kols/${node.dataset.kolStatus}/status`, {
+              method: "PATCH",
+              body: JSON.stringify({ status: node.value }),
+            });
+            await loadKols();
+          } catch (error) {
+            setMessage(els.kolError, error.message, true);
+          }
+        });
+      });
+
+      els.kolList.querySelectorAll("button[data-delete-kol]").forEach((node) => {
+        node.addEventListener("click", async () => {
+          try {
+            await fetch(`${apiBase}/api/kols/${node.dataset.deleteKol}`, { method: "DELETE" });
+            await loadKols();
+          } catch (error) {
+            setMessage(els.kolError, error.message, true);
+          }
+        });
+      });
+    }
+
+    async function switchSection(section) {
+      state.section = section;
+      els.navButtons.forEach((button) => button.classList.toggle("active", button.dataset.section === section));
+      Object.entries(els.sections).forEach(([key, node]) => node.classList.toggle("active", key === section));
+      els.pageTitle.textContent = pageMeta[section].title;
+      els.pageDesc.textContent = pageMeta[section].desc;
+      if (section === "data") {
+        await ensureLiveDataOnTabEnter();
+      }
+      if (section === "kol") {
+        await loadKols();
+      }
+    }
+
+    function bindEvents() {
+      els.navButtons.forEach((button) => {
+        button.addEventListener("click", () => switchSection(button.dataset.section));
+      });
+
+      els.materialFileInput.addEventListener("change", () => uploadMaterialFiles(els.materialFileInput.files));
+      els.addMaterialUrlBtn.addEventListener("click", addMaterialUrl);
+      els.refreshMaterialsBtn.addEventListener("click", loadMaterials);
+      els.generateContentBtn.addEventListener("click", generateContent);
+      els.clearContentBtn.addEventListener("click", () => {
+        state.contentResults = [];
+        renderContentResults();
+        setMessage(els.contentInfo, "", false);
+        setMessage(els.contentError, "", false);
+      });
+
+      els.saveSourceBtn.addEventListener("click", saveCrawlSource);
+      els.refreshLiveBtn.addEventListener("click", () => liveRefresh([]));
+      els.reloadDashboardBtn.addEventListener("click", loadDashboard);
+      els.sourceTabs.querySelectorAll("button[data-kind]").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.sourceFilter = button.dataset.kind;
+          els.sourceTabs.querySelectorAll("button").forEach((b) => b.classList.toggle("active", b === button));
+          renderCrawlSources();
+        });
+      });
+
+      els.saveKolBtn.addEventListener("click", saveKol);
+      els.resetKolBtn.addEventListener("click", resetKolForm);
+    }
+
+    async function bootstrap() {
+      renderTime();
+      setInterval(renderTime, 30000);
+      renderContentPlatforms();
+      renderContentResults();
+      bindEvents();
+      await Promise.all([loadBackendConfig(), loadMaterials()]);
+    }
+
+    bootstrap();
+  </script>
+</body>
+</html>
