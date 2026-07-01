@@ -291,6 +291,40 @@
       border: 1px solid var(--line);
     }
 
+    .upload-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 12px;
+      padding: 11px 16px;
+      cursor: pointer;
+      background: #eff6ff;
+      color: var(--blue);
+      border: 1px solid rgba(37, 99, 235, 0.32);
+      font-weight: 800;
+      margin: 0;
+      transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+    }
+
+    .upload-btn:hover {
+      background: #dbeafe;
+      border-color: rgba(37, 99, 235, 0.62);
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.14);
+      transform: translateY(-1px);
+    }
+
+    .upload-btn .icon {
+      width: 18px;
+      height: 18px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 999px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 15px;
+      line-height: 1;
+    }
+
     .hint, .info, .error {
       padding: 12px 14px;
       border-radius: 12px;
@@ -587,8 +621,9 @@
                   </div>
                 </div>
                 <div class="actions" style="margin-top:12px">
-                  <label class="subtle" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer">
-                    上传图片 / 文档
+                  <label class="upload-btn" for="materialFileInput">
+                    <span class="icon">+</span>
+                    <span>选择文件上传</span>
                     <input id="materialFileInput" type="file" accept=".txt,.md,.docx,.png,.jpg,.jpeg,.webp,.gif" multiple class="hidden" />
                   </label>
                   <button class="subtle" id="refreshMaterialsBtn">刷新素材库</button>
