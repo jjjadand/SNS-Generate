@@ -547,18 +547,21 @@
                     <input id="contentAudience" type="text" placeholder="例如：国内工业客户、方案商、AI 工程师" />
                   </div>
                   <div class="field">
-                    <label for="contentAngle">内容角度</label>
+                    <label for="contentAngle">内容类型</label>
                     <select id="contentAngle">
-                      <option value="产品发布">产品发布</option>
-                      <option value="行业洞察">行业洞察</option>
-                      <option value="案例分享">案例分享</option>
-                      <option value="活动预热">活动预热</option>
+                      <option value="demo_wiki">Demo / Wiki 教程介绍</option>
+                      <option value="event">活动宣传</option>
+                      <option value="product_intro">产品介绍</option>
                     </select>
                   </div>
                 </div>
                 <div class="field">
+                  <label for="contentCtaUrl">CTA 链接</label>
+                  <input id="contentCtaUrl" type="text" placeholder="例如：https://wiki.seeedstudio.com/..." />
+                </div>
+                <div class="field">
                   <label for="contentFeatures">核心卖点 / 参考要点</label>
-                  <textarea id="contentFeatures" placeholder="例如：&#10;1. 支持 Jetson Orin NX / AGX&#10;2. 适合本地 VLM / RAG / 工业检测&#10;3. 工业部署门槛低"></textarea>
+                  <textarea id="contentFeatures" placeholder="例如：&#10;1. Demo 能实现什么 / 活动亮点 / 产品卖点&#10;2. 关键步骤、时间地点或核心规格&#10;3. 用户点击链接后可以获得什么"></textarea>
                 </div>
                 <div class="field">
                   <label for="contentPrompt">补充 Prompt</label>
@@ -896,6 +899,7 @@
       contentTopic: document.getElementById("contentTopic"),
       contentAudience: document.getElementById("contentAudience"),
       contentAngle: document.getElementById("contentAngle"),
+      contentCtaUrl: document.getElementById("contentCtaUrl"),
       contentFeatures: document.getElementById("contentFeatures"),
       contentPrompt: document.getElementById("contentPrompt"),
       materialUrl: document.getElementById("materialUrl"),
@@ -1156,6 +1160,7 @@
             product: topic,
             audience: els.contentAudience.value.trim(),
             post_type: els.contentAngle.value,
+            cta_url: els.contentCtaUrl.value.trim(),
             features: els.contentFeatures.value.trim(),
             custom_prompt: els.contentPrompt.value.trim(),
             material_ids: Array.from(state.selectedMaterials),

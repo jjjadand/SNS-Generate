@@ -330,6 +330,7 @@ class GenerateRequest(BaseModel):
     features: Optional[str] = ""
     audience: Optional[str] = ""
     highlights: Optional[str] = ""
+    cta_url: Optional[str] = ""
     subject_line: Optional[str] = ""
     keyword: Optional[str] = ""
     region: Optional[str] = "Global"
@@ -433,14 +434,42 @@ SOCIAL_PLATFORM_GUIDES_ZH = {
     "视频号": "输出顺序：1. 标题 2. 发布文案 3. 30-60 秒口播脚本。适合企业账号发布。",
     "B站": "输出顺序：1. 标题 2. 简介 3. 视频大纲。强调技术点、适合工程师观看。",
     "知乎": "输出顺序：1. 标题 2. 摘要 3. 正文。结构清晰，强调专业分析和可验证信息。",
-    "LinkedIn": "输出 180-300 字左右的中文专业帖子，语气克制、可信，适合企业和技术决策者。",
-    "X": "输出短帖或 thread 首帖，中文表达简洁，适合快速传播和转发。",
+    "LinkedIn": "严格使用结构：第一行是一句话标题；第二段用一句话做整体介绍；然后分点介绍核心卖点、实现步骤或参与亮点；最后一行写 CTA，并放入指定链接。语气克制、可信，适合企业和技术决策者。",
+    "X": "更短、更直接。用 1 句 hook + 1-2 个关键信息点 + CTA 链接；尽量控制在单条短帖长度内，避免长段落和复杂铺垫。",
 }
 
 SOCIAL_PLATFORM_GUIDES_EN = {
-    "LinkedIn": "Output a polished B2B LinkedIn post, 150-250 words, professional and insight-driven.",
-    "X": "Output a concise X post or short thread opener, punchy and shareable.",
+    "LinkedIn": "Use this exact structure: one-line headline, one-sentence overview, bullet points for value points or implementation steps, and a final CTA with the provided link.",
+    "X": "Keep it much shorter: one hook, one or two key points, and a CTA link. Avoid long paragraphs.",
     "微信公众号": "Output in Chinese even if other fields are English. Use a long-form article structure.",
+}
+
+CONTENT_CATEGORY_GUIDES_ZH = {
+    "demo_wiki": "Demo / Wiki 教程介绍：目标是让用户点击教程并复现。重点写清楚用户能学到什么、适合谁、关键实现步骤、需要的硬件/软件、最终能跑出什么效果。",
+    "event": "活动宣传：目标是让用户报名、预约或观看。重点写清楚活动主题、时间/地点/形式、适合人群、议程亮点、参与收益和报名/观看 CTA。",
+    "product_intro": "产品介绍：目标是让用户了解产品价值并点击了解/购买/咨询。重点写清楚使用场景、核心卖点、规格/生态优势、部署价值和 CTA。",
+}
+
+CONTENT_CATEGORY_GUIDES_EN = {
+    "demo_wiki": "Demo / Wiki tutorial: drive users to open the tutorial and reproduce the demo. Explain what they will learn, who it is for, key implementation steps, required hardware/software, and expected result.",
+    "event": "Event promotion: drive registrations, appointments, or attendance. Cover the theme, time/place/format, audience, agenda highlights, user benefit, and registration/viewing CTA.",
+    "product_intro": "Product introduction: drive product understanding and clicks for details, purchase, or consultation. Cover use cases, core value points, specs/ecosystem strengths, deployment value, and CTA.",
+}
+
+CONTENT_CATEGORY_ALIASES = {
+    "demo": "demo_wiki",
+    "wiki": "demo_wiki",
+    "tutorial": "demo_wiki",
+    "demo/wiki教程介绍": "demo_wiki",
+    "demo/wiki 教程介绍": "demo_wiki",
+    "教程介绍": "demo_wiki",
+    "活动宣传": "event",
+    "活动预热": "event",
+    "event": "event",
+    "产品介绍": "product_intro",
+    "产品发布": "product_intro",
+    "product": "product_intro",
+    "product_intro": "product_intro",
 }
 
 
@@ -452,32 +481,45 @@ def is_chinese_request(req: GenerateRequest) -> bool:
     return any(token in platform for token in ("微信", "小红书", "抖音", "视频号", "B站", "知乎", "中文"))
 
 
+def normalize_content_category(post_type: Optional[str]) -> str:
+    raw = (post_type or "product_intro").strip()
+    return CONTENT_CATEGORY_ALIASES.get(raw, raw if raw in CONTENT_CATEGORY_GUIDES_ZH else "product_intro")
+
+
 def build_social_prompt(req: GenerateRequest) -> str:
     topic = req.topic or req.product or "未命名主题"
     audience = req.audience or "国内科技行业用户、工程师、方案负责人"
     features = req.features or req.highlights or "未提供"
     platform = req.platform or "微信公众号"
+    cta_url = (req.cta_url or "").strip() or "未提供，请在 CTA 位置保留 [CTA链接]"
+    category = normalize_content_category(req.post_type)
     is_zh = is_chinese_request(req)
     guide_map = SOCIAL_PLATFORM_GUIDES_ZH if is_zh else SOCIAL_PLATFORM_GUIDES_EN
     platform_guide = guide_map.get(platform, guide_map["微信公众号" if is_zh else "LinkedIn"])
+    category_guide = (CONTENT_CATEGORY_GUIDES_ZH if is_zh else CONTENT_CATEGORY_GUIDES_EN)[category]
 
     if is_zh:
         return f"""你是 Seeed Studio（矽递科技）的资深中文内容策划，负责为不同平台生成适配内容。
 
 目标平台：{platform}
 主题 / 产品：{topic}
-内容角度：{req.post_type or "产品亮点"}
+内容类型：{category}
 目标受众：{audience}
 关键信息：{features}
+CTA 链接：{cta_url}
 
 平台要求：
 {platform_guide}
 
+内容类型要求：
+{category_guide}
+
 统一要求：
 - 默认使用中文输出，必要时保留产品型号、英文术语
 - 不能空泛，要尽量具体、可执行、像真实市场内容
-- 优先突出产品价值、使用场景、差异化卖点
+- 根据内容类型优先突出教程价值、活动参与价值或产品卖点
 - 语气自然，不要明显 AI 腔
+- CTA 必须放在结尾；如果提供了 CTA 链接，必须原样包含该链接
 - 不要解释你的思路，只输出最终可直接发布/再编辑的内容
 """
 
@@ -485,16 +527,21 @@ def build_social_prompt(req: GenerateRequest) -> str:
 
 Target platform: {platform}
 Topic / Product: {topic}
-Angle: {req.post_type or "product value"}
+Content category: {category}
 Target audience: {audience}
 Key details: {features}
+CTA link: {cta_url}
 
 Platform requirements:
 {platform_guide}
 
+Content category requirements:
+{category_guide}
+
 Global requirements:
 - Be specific and commercially useful
-- Highlight product value, scenarios, and differentiation
+- Match the content category: tutorial value, event participation value, or product value
+- Put the CTA at the end; if a CTA link is provided, include it exactly
 - Avoid generic AI-sounding filler
 - Output only the final ready-to-edit content
 """
