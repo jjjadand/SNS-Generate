@@ -2,6 +2,9 @@
 
 这是从项目中整理出来的 SNS 内容生成和市场文章/报告生成模块，包含一套 FastAPI 后端和一个单页前端。
 
+![none]([https://raw.githubusercontent.com/username/repo/main/image.png](https://github.com/jjjadand/SNS-Generate/blob/main/desktop.png))
+
+
 ## 包含内容
 
 - `main.py`: 后端 API，负责多平台 SNS 文案生成、素材上传、网页素材抓取、实时数据抓取、KOL 管理、市场新闻搜索和市场报告生成。
